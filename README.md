@@ -62,7 +62,7 @@ whenever_priority = "minimum"
 logview_command = 'gnome-text-editor'
 ```
 
-and should be found in the so-called _application data directory_. The position of this directory varies on different operating systems:
+and should be named _whenever_tray.toml_ and found in the so-called _application data directory_. The position of this directory varies on different operating systems:
 
 * `%AppData%\whenever_tray\` on Windows
 * `~/.whenever_tray/` on UNIX/Linux
