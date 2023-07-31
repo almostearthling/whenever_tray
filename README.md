@@ -62,7 +62,7 @@ whenever_priority = "minimum"
 logview_command = 'gnome-text-editor'
 ```
 
-and should be named _whenever_tray.toml_ and found in the so-called _application data directory_. The position of this directory varies on different operating systems:
+The configuration file must be named _whenever_tray.toml_ and be available in the so-called _application data directory_. The position of this directory varies on different operating systems:
 
 * `%AppData%\whenever_tray\` on Windows
 * `~/.whenever_tray/` on UNIX/Linux
@@ -104,7 +104,7 @@ At the moment the specific requirements for MacOSX are not known: however they s
 
 ### Libraries
 
-The TOML library used in **whenever_tray** is [_toml11_](https://github.com/ToruNiina/toml11), and the cross platform graphical framework is [_WxWidgets 3.2_](https://www.wxwidgets.org/), which at the time of writing is the default supported version on _Debian 12_ -- used as the main linux testbed for the application. The [_wx_cmake_template_](https://github.com/lszl84/wx_cmake_template) has been used for scaffolding the application so that it could remain cross platform in terms of both operating and development environment: there is no need, however, to download thistemplate, since all the files generated using the template itself are directly included in the source repository.
+The TOML library used in **whenever_tray** is [_toml11_](https://github.com/ToruNiina/toml11), and the cross platform graphical framework is [_WxWidgets 3.2_](https://www.wxwidgets.org/), which at the time of writing is the default supported version on _Debian 12_ -- used as the main Linux testbed for the application. The [_wx_cmake_template_](https://github.com/lszl84/wx_cmake_template) has been used for scaffolding the application so that it could remain cross platform in terms of both operating and development environment: there is no need, however, to download thistemplate, since all the files generated using the template itself are directly included in the source repository.
 
 ### Graphics
 
