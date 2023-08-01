@@ -1,10 +1,10 @@
-# A lightweight **whenever** wrapper: **whenever_tray**
+# A Lightweight **Whenever** Wrapper: **Whenever_Tray**
 
 <!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [A lightweight **whenever** wrapper: **whenever\_tray**](#a-lightweight-whenever-wrapper-whenever_tray)
+- [A Lightweight **Whenever** Wrapper: **Whenever\_Tray**](#a-lightweight-whenever-wrapper-whenever_tray)
   - [Configuration](#configuration)
   - [Usage](#usage)
   - [Requirements](#requirements)
@@ -24,7 +24,7 @@
 
 via menu entries exposed by the wrapper. The menu can be accessed by clicking on an icon in the _tray notification area_, a common paradigm for applications that run in the background but still require some sporadic user interaction in modern graphical environments. **whenever_tray** also allows to show the log of **whenever** (provided that at least a text editor is available) via a menu entry, and to start the scheduler at lower/lowest priority by specifying it in the configuration file.
 
-The functionality of **whenever_tray** is intentionally limited to the lowest possible extent, in order to keep the code essential (thus reducing the need of specific code for specific platforms) and to use the least possibile computational resources. While CPU consumption should not be a problem, as both **whenever_tray** and **whenever** itself spend most of their time _waiting_, having a small application that uses a low amount of RAM could be desirable, in order to have the possibility that the **whenever** "suite" would run on a desktop system without a noticeable impact on it -- except when it checks conditions or executes tasks that, by user design, are resource hungry.
+The functionality of **whenever_tray** is intentionally reduced to the lowest possible limit, in order to keep the code essential (thus reducing the need of specific code for specific platforms) and to use the least possibile computational resources. While CPU consumption should not be a problem, as both **whenever_tray** and **whenever** itself spend most of their time _waiting_, having a small application that uses a low amount of RAM could be desirable, in order to have the possibility that the **whenever** "suite" would run on a desktop system without a noticeable impact on it -- except when it checks conditions or executes tasks that, by user design, are resource hungry.
 
 Once configured, **whenever_tray** takes care of
 
@@ -62,17 +62,17 @@ whenever_priority = "minimum"
 logview_command = 'gnome-text-editor'
 ```
 
-The configuration file must be named _whenever_tray.toml_ and be available in the so-called _application data directory_. The position of this directory varies on different operating systems:
+and should be found in the so-called _application data directory_. The position of this directory varies on different operating systems:
 
 * `%AppData%\whenever_tray\` on Windows
 * `~/.whenever_tray/` on UNIX/Linux
 * `~/Library/Application Support/.whenever_tray/` on Mac
 
-and the directory, as well as a well-formed configuration file, have to be present before **whenever_tray** is launched -- otherwise the application will complain that the configuration file cannot be read, before running using the default values. All entries are optional, but an empty file should at least contain an empty `[whenever_tray]` section for the application not to show an error pop-up at startup. In the `whenever_command` and `logview_command` entries, the full path to the executable can be omitted if the executable itself is in a location within the search _PATH_. A sample _whenever_tray.toml_ with all entries is provided in the repository.
+and the directory, as well as a well-formed configuration file, have to be present before **whenever_tray** is launched -- otherwise the application will complain that the configuration file cannot be read, before running using the default values. All entries are optional, but an empty file should at least contain an empty `[whenever_tray]` section for the application not to show an error pop-up at startup. A sample _whenever_tray.toml_ with the sample contents is provided in the repository. In the `whenever_command` and `logview_command` entries, the full path to the executable can be omitted if the executable itself is in a location within the search _PATH_.
 
 At the moment **whenever_tray** does not perform any substitution in the paths provided in the configuration file: a `~` is thus not expanded to the user home directory, and environment variable mentions are not replaced by their values. Since all paths will be relative to the path from which the application is launched, it is recommended to explicitly specify full paths for both `whenever_logfile` and `whenever_config`.
 
-> **NOTE**: the default values shown above yield for UNIX/Linux systems, while on Windows the default value for `whenever_command` is _whenever.exe_ and the default value for `logview_command` is actually _notepad.exe_. The new _gnome-text-editor_ is the default viewer when not compiling on Windows, however it might not be available, for instance on MacOSX or on versions of GNOME prior to the current one: in such cases it should either be explicitly specified or replaced, in the configuration file, with an available application.[^1]
+> **NOTE**: the default values shown above yield for UNIX/Linux systems, while on Windows the default value for `whenever_command` is _whenever.exe_ and the default value for `logview_command` is actually _notepad.exe_. The new _gnome-text-editor_ is the default viewer when not compiling on Windows, however it might not be present, for instance on MacOSX or on versions of GNOME prior to the current one: in such cases it should either be explicitly specified or replaced, in the configuration file, with an available application.[^1]
 
 
 ## Usage
@@ -90,7 +90,7 @@ If everything is set up correctly,[^2] the tray notification area shows, from no
 
 In order to correctly build **whenever_tray**, the following requirements need to be fulfilled:
 
-* _WxWidgets_ and its development libraries and headers must be available: the _3.2_ version has been used to develop this software, previous versions are not supported. On Windows the library has been built from scratch in order to obtain statically linkable libraries and not to depend on DLLs: to reproduce this and compile **whenever_tray** the `WXWIN` [variable](https://wiki.wxwidgets.org/Downloading_and_installing_wxWidgets) has to be set prior to running _CMake_; on Linux it is possible to use the [packages](https://docs.codelite.org/wxWidgets/repo320/) kindly provided by the folks at [_CodeLite_](https://codelite.org/);
+* _WxWidgets_ and its development libraries and headers must be available: the _3.2_ version has been used to develop this software, previous versions are not supported. On Windows the library has been built from scratch in order to obtain statically linkable libraries and not to depend on DLLs; on Linux it is possible to use the [packages](https://docs.codelite.org/wxWidgets/repo320/) kindly provided by the folks at [_CodeLite_](https://codelite.org/);
 * the preliminary steps to build the application are performed by [_CMake_](https://cmake.org/) with the hope to mitigate the hassle of being multiplatform: the _CMake_ build has been tested on Linux and Windows. In other words, the appropriate _CMake_ package is necessary for building the application on all supported systems;
 * the STL-based [_toml11_](https://github.com/ToruNiina/toml11) TOML library has been used to interpret the configuration file: in order to compile **whenever_tray** the latest released version (at the time of writing: version 3.7.1) should be downloaded from the _Releases_ page and uncompressed in a directory called `toml11` under `src`. The active master works as well, but it is preferable to rely on released versions;
 * although not properly a requirement, on Windows the _Visual Studio Community Edition_ IDE is easier to use to build a release version of the application.
@@ -104,7 +104,7 @@ At the moment the specific requirements for MacOSX are not known: however they s
 
 ### Libraries
 
-The TOML library used in **whenever_tray** is [_toml11_](https://github.com/ToruNiina/toml11), and the cross platform graphical framework is [_WxWidgets 3.2_](https://www.wxwidgets.org/), which at the time of writing is the default supported version on _Debian 12_ -- used as the main Linux testbed for the application. The [_wx_cmake_template_](https://github.com/lszl84/wx_cmake_template) has been used for scaffolding the application so that it could remain cross platform in terms of both operating and development environment: there is no need, however, to download thistemplate, since all the files generated using the template itself are directly included in the source repository.
+The TOML library used in **whenever_tray** is [_toml11_](https://github.com/ToruNiina/toml11), and the cross platform graphical framework is [_WxWidgets 3.2_](https://www.wxwidgets.org/), which at the time of writing is the default supported version on _Debian 12_ -- used as the main linux testbed for the application. The [_wx_cmake_template_](https://github.com/lszl84/wx_cmake_template) has been used for scaffolding the application so that it could remain cross platform in terms of both operating and development environment: there is no need, however, to download thistemplate, since all the files generated using the template itself are directly included in the source repository.
 
 ### Graphics
 
@@ -117,5 +117,5 @@ This tool is licensed under the LGPL v2.1 (may change to LGPL v3 in the future):
 
 
 [^1]: the best option is actually to use a viewer made explicitly for log files: for instance [glogg](https://glogg.bonnefon.org/) is free, fast, lightweight, and cross-platform; it also sports features such as searching/highlighting that come handy when dealing with verbose log files like the ones that **whenever** generates when the log level is set to _trace_.
-[^2]: that is: all required libraries are present (especially on Linux), **whenever** itself is installed and usable, the [configuration](#configuration) and the _application data directory_ exist, and are correctly positioned.
+[^2]: that is: all required libraries are present (especially on Linux), **whenever** itself is installed and usable, the [configuration](#configuration) and the _application data directory_ exist, and are correctly positioned; obviously the further requirement is that the configuration file for **whenever** is valid: as a tip, it would be appropriate to test the configuration file by running **whenever** from the console.
 [^3]: there is plenty of discussions about weaknesses and strengths of the two systems, compared to each other: in some aspects it looks like _Wayland_ is still not on par withh a quite mature project as _Xorg_ actually is; on the other hand _Wayland_ is very actively developed, therefore many issues and bugs are fixed very quickly. Being adopted by many major players in the Linux ecosystem, _Wayland_ is becoming the _de facto_ standard for Linux desktop. This feeds the hope that many of the quirks affecting it at the moment will soon be addressed.
