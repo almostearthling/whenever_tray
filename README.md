@@ -8,6 +8,7 @@
   - [Configuration](#configuration)
   - [Usage](#usage)
   - [Requirements](#requirements)
+  - [Building](#building)
   - [Credits](#credits)
     - [Libraries](#libraries)
     - [Graphics](#graphics)
@@ -98,6 +99,18 @@ In order to correctly build **whenever_tray**, the following requirements need t
 > **NOTE**: on many recent Linux distributions (namely, the ones that include GNOME 3.26 or higher), the _tray notification area_ is no more supported natively on GNOME, at least in the form used by the _WxWidgets_ library: a GNOME shell extension (for example: [Appindicator](https://extensions.gnome.org/extension/615/appindicator-support/) or [Tray Icons: Reloaded](https://extensions.gnome.org/extension/2890/tray-icons-reloaded/)) might have to be installed. Moreover, there are still many problems with _WxWidgets_ on _Wayland_, especially when using _Xwayland_ (by defining/exporting `GDK_BACKEND=x11` before the command that launches **whenever_tray**) which is needed for the tray icon to be shown, because _WxWidgets_ uses a legacy protocol to display an icon on the notification area that is only supported on _X11_. The best solution so far to have **whenever_tray** working on a recent Linux desktop, is to start the session in _Xorg mode_. To achieve this, still on the login screen, the user should click the small icon on the lower right corner that appears upon selection of an account, and click the _GNOME on Xorg_ entry. The choice will be remembered for the following sessions. However this might also result in a different user experience, either snappier or slower depending on how the desktop system is used.[^3]
 
 At the moment the specific requirements for MacOSX are not known: however they should be similar to the ones summarized above. Where possible, the use of a binary release might be a more viable alternative, even though there are no specific installers or packages for now.
+
+
+## Building
+
+If all the above requirements have been satisfied, then building the application should be as easy as launching the following commands in the main build tree (where _CMakeLists.txt_ is located):
+
+```shell
+cmake -S. -B_local
+cmake --build _local
+```
+
+and the resulting executable will be found in `_local/subprojects/Build/whenever_tray_core/`, in the _Debug_ or _Release_ subdirectory, depending mainly on the host OS: on Windows it might be easier to open the `_local/whenever_tray.sln` file in Visual Studio Community Edition in order to obtain a release build.
 
 
 ## Credits
