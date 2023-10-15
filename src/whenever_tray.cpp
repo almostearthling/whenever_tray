@@ -59,7 +59,7 @@
                         "scheduler interface through an icon in the tray notification\n"    \
                         "area and its associated menu.\n\n"                                 \
                         "(running: %s)\n"
-#define APP_VERSION "0.1.2"
+#define APP_VERSION "0.1.3"
 #define APP_COPYRIGHT "(c) 2023"
 #define APP_AUTHOR "Francesco Garosi"
 #define APP_WEBSITE "https://github.com/almostearthling/"
@@ -80,6 +80,7 @@ const char* LOGVIEW_DEFAULT_COMMAND = "gnome-text-editor";
 const char* WHENEVER_CMD_EXIT = "exit\n";
 const char* WHENEVER_CMD_PAUSE = "pause\n";
 const char* WHENEVER_CMD_RESUME = "resume\n";
+const char* WHENEVER_CMD_RESETCONDS = "reset_conditions\n";
 
 // configuration file name (to be found in the hidden user data directory)
 const char* CONFIG_FILE = "whenever_tray.toml";
@@ -110,8 +111,7 @@ static WTHiddenFrame* hidden_frame = NULL;
 // WTPipedProcess: implementation
 // ============================================================================
 
-void WTPipedProcess::OnTerminate(int pid, int status)
-{
+void WTPipedProcess::OnTerminate(int pid, int status) {
     m_bAlive = false;
     wxProcess::OnTerminate(pid, status);
 }
@@ -122,15 +122,12 @@ void WTPipedProcess::OnTerminate(int pid, int status)
 
 wxIMPLEMENT_APP(WTApp);
 
-bool WTApp::OnInit()
-{
-    if (!wxApp::OnInit())
-    {
+bool WTApp::OnInit() {
+    if (!wxApp::OnInit()) {
         return false;
     }
 
-    if (!wxTaskBarIcon::IsAvailable())
-    {
+    if (!wxTaskBarIcon::IsAvailable()) {
         wxMessageBox(
             "No tray area support on OS: leaving.",
             "Error",
@@ -155,8 +152,7 @@ wxBEGIN_EVENT_TABLE(WTHiddenFrame, wxFrame)
     EVT_CLOSE(WTHiddenFrame::OnCloseWindow)
 wxEND_EVENT_TABLE()
 
-WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title)
-{
+WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title) {
     wxIcon tbicon(tray_clock_xpm);
 
     // initialize process reference members
@@ -167,8 +163,7 @@ WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, ti
     SetIcon(tbicon);
 
     m_taskBarIcon = new WheneverTrayIcon();
-    if (!m_taskBarIcon->SetIcon(tbicon, APP_NAME_LONG))
-    {
+    if (!m_taskBarIcon->SetIcon(tbicon, APP_NAME_LONG)) {
         wxMessageBox(
             "Could not set icon: exiting.",
             "Error",
@@ -178,8 +173,7 @@ WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, ti
 
 #if defined(__WXOSX__) && wxOSX_USE_COCOA
     m_dockIcon = new MyTaskBarIcon(wxTBI_DOCK);
-    if (!m_dockIcon->SetIcon(tbicon, APP_NAME_LONG))
-    {
+    if (!m_dockIcon->SetIcon(tbicon, APP_NAME_LONG)) {
         wxMessageBox(
             "Could not set dock icon: exiting.",
             "Error",
@@ -197,62 +191,45 @@ WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, ti
     wxString t_cmdver;
     wxArrayString t_cmdout;
 
-    try
-    {
+    try {
         auto res_conf = toml::parse(cfgfile.ToStdString());
-        if (!res_conf.is_table() && !res_conf.contains("whenever_tray"))
-        {
+        if (!res_conf.is_table() && !res_conf.contains("whenever_tray")) {
             command_path = wxString(WHENEVER_COMMAND);
             logview_command_path = wxString(LOGVIEW_DEFAULT_COMMAND);
             config_path = data_dir + wxFileName::GetPathSeparator() + wxString(WHENEVER_CONFIG);
             log_path = data_dir + wxFileName::GetPathSeparator() + wxString(WHENEVER_LOG);
             log_level = wxString(WHENEVER_LOGLEVEL);
-        }
-        else
-        {
+        } else {
             // there might be better ways to extract the configuration, but
             // this is quick and does the job: anyway all the local variables
             // used during the process are thrown away after initialization
             auto conf = toml::find<std::map<std::string, std::string>>(res_conf, "whenever_tray");
             auto e1 = conf.find("whenever_command");
-            if (e1 != conf.end())
-            {
+            if (e1 != conf.end()) {
                 command_path = wxString(conf["whenever_command"]);
-            }
-            else
-            {
+            } else {
                 command_path = wxString(WHENEVER_COMMAND);
             }
             auto e2 = conf.find("whenever_config");
-            if (e2 != conf.end())
-            {
+            if (e2 != conf.end()) {
                 config_path = wxString(conf["whenever_config"]);
-            }
-            else
-            {
+            } else {
                 config_path = data_dir + wxFileName::GetPathSeparator() + wxString(WHENEVER_CONFIG);
             }
             auto e3 = conf.find("whenever_logfile");
-            if (e3 != conf.end())
-            {
+            if (e3 != conf.end()) {
                 log_path = wxString(conf["whenever_logfile"]);
-            }
-            else
-            {
+            } else {
                 log_path = data_dir + wxFileName::GetPathSeparator() + wxString(WHENEVER_LOG);
             }
             auto e4 = conf.find("whenever_loglevel");
-            if (e4 != conf.end())
-            {
+            if (e4 != conf.end()) {
                 log_level = wxString(conf["whenever_loglevel"]);
                 wxString allowed = wxString("/error/warn/info/debug/trace/");
-                if (allowed.find(wxString::Format("/%s/", log_level)) == wxNOT_FOUND)
-                {
+                if (allowed.find(wxString::Format("/%s/", log_level)) == wxNOT_FOUND)  {
                     log_level = wxString(WHENEVER_LOGLEVEL);
                 }
-            }
-            else
-            {
+            } else {
                 log_level = wxString(WHENEVER_LOGLEVEL);
             }
             auto e5 = conf.find("whenever_priority");
@@ -260,12 +237,9 @@ WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, ti
             {
                 auto s = wxString(conf["whenever_priority"]);
                 wxString allowed = wxString("/normal/low/minimum/");
-                if (allowed.find(wxString::Format("/%s/", s)) == wxNOT_FOUND)
-                {
+                if (allowed.find(wxString::Format("/%s/", s)) == wxNOT_FOUND) {
                     priority = PRIORITY_MINIMUM;
-                }
-                else
-                {
+                } else {
                     if (s == "normal")
                         priority = PRIORITY_NORMAL;
                     else if (s == "low")
@@ -275,18 +249,14 @@ WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, ti
                 }
             }
             auto e6 = conf.find("logview_command");
-            if (e6 != conf.end())
-            {
+            if (e6 != conf.end()) {
                 logview_command_path = wxString(conf["logview_command"]);
-            }
-            else
-            {
+            } else {
                 logview_command_path = wxString(LOGVIEW_DEFAULT_COMMAND);
             }
         }
     }
-    catch (...)
-    {
+    catch (...) {
         wxMessageBox(
             "Could not read/parse configuration file:\n"
             "please check for presence or errors.\n"
@@ -303,12 +273,9 @@ WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, ti
     // retrieve the version of Whenever directly from the command line
     t_cmdver << "\"" << command_path << "\"" << wxString(" --version");
     wxExecute(t_cmdver, t_cmdout, wxEXEC_SYNC | wxEXEC_HIDE_CONSOLE);
-    if (t_cmdout.IsEmpty())
-    {
+    if (t_cmdout.IsEmpty()) {
         m_cmdVersion = "unknown version";
-    }
-    else
-    {
+    } else {
         m_cmdVersion = t_cmdout[0];
     }
 
@@ -325,8 +292,7 @@ WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, ti
         << "\"" << logview_command_path << "\"" << " "
         << "\"" << log_path << "\"";
 
-    if (!StartWheneverCommand(priority))
-    {
+    if (!StartWheneverCommand(priority)) {
         wxMessageBox(
             "Could not start scheduler process:\n"
             "please check configuration file.",
@@ -338,29 +304,24 @@ WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, ti
 
 /// Destructor: stop process, if any, then delete dynamic data. The exit
 /// handlers defined below leave gracefully
-WTHiddenFrame::~WTHiddenFrame()
-{
+WTHiddenFrame::~WTHiddenFrame() {
     StopWheneverCommand();
     delete m_taskBarIcon;
 }
 
 // See above
-void WTHiddenFrame::OnExit(wxCommandEvent& WXUNUSED(event))
-{
+void WTHiddenFrame::OnExit(wxCommandEvent& WXUNUSED(event)) {
     Close(true);
 }
 
 // See above
-void WTHiddenFrame::OnCloseWindow(wxCloseEvent& WXUNUSED(event))
-{
+void WTHiddenFrame::OnCloseWindow(wxCloseEvent& WXUNUSED(event)) {
     Destroy();
 }
 
 /// Interface to start the underlying command (same on Windows and UNIX)
-bool WTHiddenFrame::StartWheneverCommand(unsigned int priority)
-{
-    if (!m_process)
-    {
+bool WTHiddenFrame::StartWheneverCommand(unsigned int priority) {
+    if (!m_process) {
         m_process = new WTPipedProcess(this);
     }
     // run the scheduler at selected priority
@@ -373,18 +334,15 @@ bool WTHiddenFrame::StartWheneverCommand(unsigned int priority)
     if (!m_process->Alive()) {
         m_pid = 0;
     }
-    if (!m_pid)
-    {
+    if (!m_pid) {
         return false;
     }
     return true;
 }
 
 /// Interface to stop the scheduler: uses the communication channel (stdin)
-bool WTHiddenFrame::StopWheneverCommand()
-{
-    if (m_pid && m_process->Exists(m_pid))
-    {
+bool WTHiddenFrame::StopWheneverCommand() {
+    if (m_pid && m_process->Exists(m_pid)) {
         // in most cases the command is expected to work and the scheduler
         // will exit cleanly in a short while (normally is a fraction of a
         // second, because *whenever* will try to react to commands at most
@@ -393,91 +351,81 @@ bool WTHiddenFrame::StopWheneverCommand()
         // is returned to remind that something has failed - although the
         // current implementation just ignores this return value
         wxOutputStream* appstdin = m_process->GetOutputStream();
-        if (appstdin)
-        {
+        if (appstdin) {
             // shorten the command in order to remove the trailing zero
             appstdin->WriteAll(WHENEVER_CMD_EXIT, strlen(WHENEVER_CMD_EXIT));
             SLEEP(APP_KILL_SLEEP);
         }
-        if (!m_process->Exists(m_pid))
-        {
+        if (!m_process->Exists(m_pid)) {
             m_pid = 0;
             return true;
-        }
-        else
-        {
+        } else {
             m_process->Kill(m_pid, wxSIGKILL, wxKILL_CHILDREN);
             SLEEP(APP_KILL_SLEEP);
             return false;
         }
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
 
 /// Interface to pause the scheduler: uses the communication channel (stdin)
-bool WTHiddenFrame::PauseWheneverCommand()
-{
-    if (m_pid && m_process->Exists(m_pid))
-    {
+bool WTHiddenFrame::PauseWhenever() {
+    if (m_pid && m_process->Exists(m_pid)) {
         wxOutputStream* appstdin = m_process->GetOutputStream();
-        if (appstdin)
-        {
+        if (appstdin) {
             // shorten the command in order to remove the trailing zero
             appstdin->WriteAll(WHENEVER_CMD_PAUSE, strlen(WHENEVER_CMD_PAUSE));
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
 
 /// Interface to resume the scheduler: uses the communication channel (stdin)
-bool WTHiddenFrame::ResumeWheneverCommand()
-{
-    if (m_pid && m_process->Exists(m_pid))
-    {
+bool WTHiddenFrame::ResumeWhenever() {
+    if (m_pid && m_process->Exists(m_pid)) {
         wxOutputStream* appstdin = m_process->GetOutputStream();
-        if (appstdin)
-        {
+        if (appstdin) {
             // shorten the command in order to remove the trailing zero
             appstdin->WriteAll(WHENEVER_CMD_RESUME, strlen(WHENEVER_CMD_RESUME));
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
+    } else {
+        return false;
     }
-    else
-    {
+}
+
+/// Interface to reset conditions: uses the communication channel (stdin)
+bool WTHiddenFrame::ResetConditions() {
+    if (m_pid && m_process->Exists(m_pid)) {
+        wxOutputStream* appstdin = m_process->GetOutputStream();
+        if (appstdin) {
+            // shorten the command in order to remove the trailing zero
+            appstdin->WriteAll(WHENEVER_CMD_RESETCONDS, strlen(WHENEVER_CMD_RESETCONDS));
+            return true;
+        } else {
+            return false;
+        }
+    } else {
         return false;
     }
 }
 
 /// Interface to resume the scheduler: uses the communication channel (stdin)
-bool WTHiddenFrame::ShowWheneverLog()
-{
-    if (m_pid && m_process->Exists(m_pid))
-    {
+bool WTHiddenFrame::ShowWheneverLog() {
+    if (m_pid && m_process->Exists(m_pid)) {
         if (wxExecute(m_cmdLineLogView, wxEXEC_ASYNC) < 0) {
             return false;
-        }
-        else
-        {
+        } else {
             return true;
         }
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
@@ -486,10 +434,10 @@ bool WTHiddenFrame::ShowWheneverLog()
 // WheneverTrayIcon implementation
 // ----------------------------------------------------------------------------
 
-enum
-{
+enum {
     PU_PAUSE = 10001,
     PU_RESUME,
+    PU_RESET_CONDITIONS,
     PU_SHOW_LOG,
     PU_ABOUT,
     PU_EXIT,
@@ -498,39 +446,40 @@ enum
 wxBEGIN_EVENT_TABLE(WheneverTrayIcon, wxTaskBarIcon)
     EVT_MENU(PU_PAUSE, WheneverTrayIcon::OnMenuPause)
     EVT_MENU(PU_RESUME, WheneverTrayIcon::OnMenuResume)
+    EVT_MENU(PU_RESET_CONDITIONS, WheneverTrayIcon::OnMenuResetConditions)
     EVT_MENU(PU_SHOW_LOG, WheneverTrayIcon::OnMenuShowLog)
     EVT_MENU(PU_EXIT, WheneverTrayIcon::OnMenuExit)
     EVT_MENU(PU_ABOUT, WheneverTrayIcon::OnMenuAbout)
 wxEND_EVENT_TABLE()
 
 /// Handle Menu: (Tray) -> &Pause
-void WheneverTrayIcon::OnMenuPause(wxCommandEvent&)
-{
-    hidden_frame->PauseWheneverCommand();
+void WheneverTrayIcon::OnMenuPause(wxCommandEvent&) {
+    hidden_frame->PauseWhenever();
 }
 
 /// Handle Menu: (Tray) -> Res&ume
-void WheneverTrayIcon::OnMenuResume(wxCommandEvent&)
-{
-    hidden_frame->ResumeWheneverCommand();
+void WheneverTrayIcon::OnMenuResume(wxCommandEvent&) {
+    hidden_frame->ResumeWhenever();
+}
+
+/// Handle Menu: (Tray) -> Reset &Conditions
+void WheneverTrayIcon::OnMenuResetConditions(wxCommandEvent&) {
+    hidden_frame->ResetConditions();
 }
 
 /// Handle Menu: (Tray) -> Show &Log
-void WheneverTrayIcon::OnMenuShowLog(wxCommandEvent&)
-{
+void WheneverTrayIcon::OnMenuShowLog(wxCommandEvent&) {
     hidden_frame->ShowWheneverLog();
 }
 
 /// Handle Menu: (Tray) -> E&xit
-void WheneverTrayIcon::OnMenuExit(wxCommandEvent&)
-{
+void WheneverTrayIcon::OnMenuExit(wxCommandEvent&) {
     hidden_frame->StopWheneverCommand();
     hidden_frame->Close(true);
 }
 
 /// Handle Menu: (Tray) -> &About (build and show about box)
-void WheneverTrayIcon::OnMenuAbout(wxCommandEvent&)
-{
+void WheneverTrayIcon::OnMenuAbout(wxCommandEvent&) {
     wxIcon icon(about_clock_xpm);
     wxString desc;
 
@@ -549,11 +498,11 @@ void WheneverTrayIcon::OnMenuAbout(wxCommandEvent&)
 }
 
 /// Create the main popup menu that activates by right-clicking tray icon
-wxMenu* WheneverTrayIcon::CreatePopupMenu()
-{
+wxMenu* WheneverTrayIcon::CreatePopupMenu() {
     wxMenu* menu = new wxMenu;
     menu->Append(PU_PAUSE, "&Pause Scheduler");
     menu->Append(PU_RESUME, "Res&ume Scheduler");
+    menu->Append(PU_RESET_CONDITIONS, "Reset &Conditions");
     menu->Append(PU_SHOW_LOG, "Show &Log...");
     menu->AppendSeparator();
     menu->Append(PU_ABOUT, "&About...");
@@ -567,5 +516,6 @@ wxMenu* WheneverTrayIcon::CreatePopupMenu()
     }
     return menu;
 }
+
 
 // end.

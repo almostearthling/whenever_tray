@@ -8,15 +8,13 @@
 /// Based on the *wxTaskBarIcon demo* by Julian Smart for wxWidgets.
 
 // Define a new application
-class WTApp : public wxApp
-{
+class WTApp : public wxApp {
 public:
     virtual bool OnInit() wxOVERRIDE;
 };
 
 // Define the taskbar icon interface
-class WheneverTrayIcon : public wxTaskBarIcon
-{
+class WheneverTrayIcon : public wxTaskBarIcon {
 public:
 #if defined(__WXOSX__) && wxOSX_USE_COCOA
     MyTaskBarIcon(wxTaskBarIconType iconType = wxTBI_DEFAULT_TYPE)
@@ -24,12 +22,12 @@ public:
 #else
     WheneverTrayIcon()
 #endif
-    {
-    }
+    { }
 
     void OnMenuExit(wxCommandEvent&);
     void OnMenuPause(wxCommandEvent&);
     void OnMenuResume(wxCommandEvent&);
+    void OnMenuResetConditions(wxCommandEvent&);
     void OnMenuShowLog(wxCommandEvent&);
     void OnMenuAbout(wxCommandEvent&);
     virtual wxMenu* CreatePopupMenu() wxOVERRIDE;
@@ -41,8 +39,7 @@ public:
 class WTPipedProcess;
 
 // Define a new frame type: this is going to be our main frame
-class WTHiddenFrame : public wxFrame
-{
+class WTHiddenFrame : public wxFrame {
 public:
     // ctor(s)
     WTHiddenFrame(const wxString& title);
@@ -51,11 +48,11 @@ public:
     // interface to the underlying *whenever* process
     bool StartWheneverCommand(unsigned int priority);
     bool StopWheneverCommand();
-    bool PauseWheneverCommand();
-    bool ResumeWheneverCommand();
+    bool PauseWhenever();
+    bool ResumeWhenever();
+    bool ResetConditions();
     bool ShowWheneverLog();
-    wxString GetWheneverVersion()
-    {
+    wxString GetWheneverVersion() {
         return m_cmdVersion.Clone();
     }
 
@@ -80,11 +77,9 @@ private:
 
 // This is the handler for process termination events, specialized for
 // output redirection and capture
-class WTPipedProcess : public wxProcess
-{
+class WTPipedProcess : public wxProcess {
 public:
-    WTPipedProcess(WTHiddenFrame* parent) : wxProcess(parent)
-    {
+    WTPipedProcess(WTHiddenFrame* parent) : wxProcess(parent) {
         m_parent = parent;
         Redirect();
         m_bAlive = true;
@@ -100,5 +95,6 @@ protected:
     wxString m_cmd;
     bool m_bAlive;
 };
+
 
 // end.
