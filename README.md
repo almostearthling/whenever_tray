@@ -84,7 +84,7 @@ As long as no installation utility is provided, all the setup to allow **wheneve
 2. add this shortcut to the list of applications that start at the beginning of the session ([startup applications](https://help.gnome.org/users/gnome-help/stable/shell-apps-auto-start.html.en) on GNOME and [startup apps](https://support.microsoft.com/en-us/windows/add-an-app-to-run-automatically-at-startup-in-windows-10-150da165-dcd9-7230-517b-cf3c295d89dd) on Windows)
 3. log out and log in again.
 
-If everything is set up correctly,[^3] the tray notification area shows, from now on, a small clock icon from which it is possible to access the above described functionalities to interact with a running instance of **whenever**.
+If everything is set up correctly,[^3] the tray notification area shows, from now on, a small metronome icon from which it is possible to access the above described functionalities to interact with a running instance of **whenever**.
 
 
 ## Requirements
@@ -121,7 +121,7 @@ The TOML library used in **whenever_tray** is [_toml11_](https://github.com/Toru
 
 ### Graphics
 
-The icon used in the _About Box_ has been released for free by Rafi at [GraphicsFuel](https://www.graphicsfuel.com/). The clock icon used in the _tray notification area_ is an interpretation/reworking of a glyph provided by Google in its [Material Design Icons](https://fonts.google.com/icons) collection.
+The metronome icon used both in the _About Box_ and in the _tray notification area_ is [distributed and created by Freepik - Flaticon](https://www.flaticon.com/free-icons/metronome).
 
 
 ## License

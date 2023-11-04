@@ -45,8 +45,8 @@
 
 #include "whenever_tray.h"
 
-#include "images/tray_clock.xpm"
-#include "images/about_clock.xpm"
+#include "images/icon_tray.xpm"
+#include "images/icon_about.xpm"
 
 // shortcut to show the main frame in debug sessions: must be false
 #define DEBUG_SHOW_FRAME false
@@ -59,7 +59,7 @@
                         "scheduler interface through an icon in the tray notification\n"    \
                         "area and its associated menu.\n\n"                                 \
                         "(running: %s)\n"
-#define APP_VERSION "0.1.3"
+#define APP_VERSION "0.1.4"
 #define APP_COPYRIGHT "(c) 2023"
 #define APP_AUTHOR "Francesco Garosi"
 #define APP_WEBSITE "https://github.com/almostearthling/"
@@ -107,6 +107,7 @@ const unsigned int PRIORITY_LOW = (wxPRIORITY_DEFAULT - wxPRIORITY_MIN) / 2;
 
 static WTHiddenFrame* hidden_frame = NULL;
 
+
 // ============================================================================
 // WTPipedProcess: implementation
 // ============================================================================
@@ -115,6 +116,7 @@ void WTPipedProcess::OnTerminate(int pid, int status) {
     m_bAlive = false;
     wxProcess::OnTerminate(pid, status);
 }
+
 
 // ----------------------------------------------------------------------------
 // WTApp: the application class
@@ -142,6 +144,7 @@ bool WTApp::OnInit() {
     return true;
 }
 
+
 // ----------------------------------------------------------------------------
 // WTHiddenFrame: the hidden application frame
 // ----------------------------------------------------------------------------
@@ -153,7 +156,7 @@ wxBEGIN_EVENT_TABLE(WTHiddenFrame, wxFrame)
 wxEND_EVENT_TABLE()
 
 WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title) {
-    wxIcon tbicon(tray_clock_xpm);
+    wxIcon tbicon(icon_tray);
 
     // initialize process reference members
     m_process = NULL;
@@ -233,8 +236,7 @@ WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, ti
                 log_level = wxString(WHENEVER_LOGLEVEL);
             }
             auto e5 = conf.find("whenever_priority");
-            if (e5 != conf.end())
-            {
+            if (e5 != conf.end()) {
                 auto s = wxString(conf["whenever_priority"]);
                 wxString allowed = wxString("/normal/low/minimum/");
                 if (allowed.find(wxString::Format("/%s/", s)) == wxNOT_FOUND) {
@@ -430,6 +432,7 @@ bool WTHiddenFrame::ShowWheneverLog() {
     }
 }
 
+
 // ----------------------------------------------------------------------------
 // WheneverTrayIcon implementation
 // ----------------------------------------------------------------------------
@@ -480,7 +483,7 @@ void WheneverTrayIcon::OnMenuExit(wxCommandEvent&) {
 
 /// Handle Menu: (Tray) -> &About (build and show about box)
 void WheneverTrayIcon::OnMenuAbout(wxCommandEvent&) {
-    wxIcon icon(about_clock_xpm);
+    wxIcon icon(icon_about);
     wxString desc;
 
     desc.Printf(APP_DESCRIPTION, hidden_frame->GetWheneverVersion());
