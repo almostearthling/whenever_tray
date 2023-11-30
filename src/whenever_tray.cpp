@@ -42,11 +42,12 @@
 #include <wx/stdpaths.h>
 #include <wx/aboutdlg.h>
 #include <wx/arrstr.h>
+#include <wx/bmpbndl.h>
+#include <wx/gdicmn.h>
 
 #include "whenever_tray.h"
 
-#include "images/icon_tray.xpm"
-#include "images/icon_about.xpm"
+#include "images/icon_svg.h"
 
 // shortcut to show the main frame in debug sessions: must be false
 #define DEBUG_SHOW_FRAME false
@@ -59,7 +60,7 @@
                         "scheduler interface through an icon in the tray notification\n"    \
                         "area and its associated menu.\n\n"                                 \
                         "(running: %s)\n"
-#define APP_VERSION "0.1.4"
+#define APP_VERSION "0.1.5"
 #define APP_COPYRIGHT "(c) 2023"
 #define APP_AUTHOR "Francesco Garosi"
 #define APP_WEBSITE "https://github.com/almostearthling/"
@@ -156,14 +157,18 @@ wxBEGIN_EVENT_TABLE(WTHiddenFrame, wxFrame)
 wxEND_EVENT_TABLE()
 
 WTHiddenFrame::WTHiddenFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title) {
-    wxIcon tbicon(icon_tray);
+    // build icons from the embedded SVG data
+    wxBitmapBundle bmp_bundle =
+        wxBitmapBundle::FromSVG(ICON_SVG, wxSize(32, 32));
+    wxIcon tbicon = bmp_bundle.GetIcon(wxSize(16, 16));
+    wxIcon frameicon = bmp_bundle.GetIcon(wxSize(32, 32));
 
     // initialize process reference members
     m_process = NULL;
     m_pid = 0;
 
     // set the frame icon
-    SetIcon(tbicon);
+    SetIcon(frameicon);
 
     m_taskBarIcon = new WheneverTrayIcon();
     if (!m_taskBarIcon->SetIcon(tbicon, APP_NAME_LONG)) {
@@ -483,7 +488,10 @@ void WheneverTrayIcon::OnMenuExit(wxCommandEvent&) {
 
 /// Handle Menu: (Tray) -> &About (build and show about box)
 void WheneverTrayIcon::OnMenuAbout(wxCommandEvent&) {
-    wxIcon icon(icon_about);
+    wxBitmapBundle bmp_bundle =
+        wxBitmapBundle::FromSVG(ICON_SVG, wxSize(128, 128));
+
+    wxIcon icon = bmp_bundle.GetIcon(wxSize(128, 128));
     wxString desc;
 
     desc.Printf(APP_DESCRIPTION, hidden_frame->GetWheneverVersion());
