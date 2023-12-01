@@ -121,7 +121,7 @@ The TOML library used in **whenever_tray** is [_toml11_](https://github.com/Toru
 
 ### Graphics
 
-The metronome icon used both in the _About Box_ and in the _tray notification area_ is based on a simple graphic released in the public domain by [SVG Repo](https://www.svgrepo.com/svg/148415/metronome).
+The metronome icon used both in the _About Box_ and in the _tray notification area_ has been expressly designed for this application, and is available in the source tree as a SVG file.
 
 
 ## License
