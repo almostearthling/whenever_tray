@@ -93,8 +93,7 @@ In order to correctly build **whenever_tray**, the following requirements need t
 
 * _WxWidgets_ and its development libraries and headers must be available: the _3.2_ version has been used to develop this software, previous versions are not supported. On Windows the library has been built from scratch in order to obtain statically linkable libraries and not to depend on DLLs; on Linux it is possible to use the [packages](https://docs.codelite.org/wxWidgets/repo320/) kindly provided by the folks at [_CodeLite_](https://codelite.org/);
 * the preliminary steps to build the application are performed by [_CMake_](https://cmake.org/) with the hope to mitigate the hassle of being multiplatform: the _CMake_ build has been tested on Linux and Windows. In other words, the appropriate _CMake_ package is necessary for building the application on all supported systems;
-* the STL-based [_toml11_](https://github.com/ToruNiina/toml11) TOML library has been used to interpret the configuration file: in order to compile **whenever_tray** the latest released version (at the time of writing: version 3.7.1) should be downloaded from the _Releases_ page and uncompressed in a directory called `toml11` under `src`. The active master works as well, but it is preferable to rely on released versions;
-* although not properly a requirement, on Windows the _Visual Studio Community Edition_ IDE is easier to use to build a release version of the application.
+* the STL-based [_toml11_](https://github.com/ToruNiina/toml11) TOML library has been used to interpret the configuration file: in order to compile **whenever_tray** the latest released version (at the time of writing: version 3.7.1) should be downloaded from the _Releases_ page and uncompressed in a directory called `toml11` under `src`. The active master works as well, but it is preferable to rely on released versions.
 
 > **NOTE**: on many recent Linux distributions (namely, the ones that include GNOME 3.26 or higher), the _tray notification area_ is no more supported natively on GNOME, at least in the form used by the _WxWidgets_ library: a GNOME shell extension (for example: [Appindicator](https://extensions.gnome.org/extension/615/appindicator-support/) or [Tray Icons: Reloaded](https://extensions.gnome.org/extension/2890/tray-icons-reloaded/)) might have to be installed. Moreover, there are still many problems with _WxWidgets_ on _Wayland_, especially when using _Xwayland_ (by defining/exporting `GDK_BACKEND=x11` before the command that launches **whenever_tray**) which is needed for the tray icon to be shown, because _WxWidgets_ uses a legacy protocol to display an icon on the notification area that is only supported on _X11_. The best solution so far to have **whenever_tray** working on a recent Linux desktop, is to start the session in _Xorg mode_. To achieve this, still on the login screen, the user should click the small icon on the lower right corner that appears upon selection of an account, and click the _GNOME on Xorg_ entry. The choice will be remembered for the following sessions. However this might also result in a different user experience, either snappier or slower depending on how the desktop system is used.[^4]
 
@@ -110,7 +109,13 @@ cmake -S. -B_local
 cmake --build _local
 ```
 
-and the resulting executable will be found in `_local/subprojects/Build/whenever_tray_core/`, in the _Debug_ or _Release_ subdirectory, depending mainly on the host OS: on Windows it might be easier to open the `_local/whenever_tray.sln` file in Visual Studio Community Edition in order to obtain a release build.
+and the resulting executable will be found in `_local/subprojects/Build/whenever_tray_core/`, in the _Debug_ or _Release_ subdirectory. On Windows the command
+
+```shell
+cmake --build _local --config Release
+```
+
+should be used to build a release version.
 
 
 ## Credits
