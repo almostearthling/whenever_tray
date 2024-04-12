@@ -53,15 +53,23 @@
 #define DEBUG_SHOW_FRAME false
 
 // definitions and constants
-#define APP_NAME "WheneverTray"
+
+// application name refers to whenever, and begins with a capital letter on Windows
+#ifdef __WINDOWS__
+#define APP_NAME "Whenever"
+#else
+#define APP_NAME "whenever"
+#endif
+
+#define APP_DISPLAY_NAME "Whenever Launcher"
 #define APP_NAME_LONG "Minimalistic launcher for Whenever"
 #define APP_DESCRIPTION "A minimalistic launcher to start/stop the Whenever scheduler\n"    \
                         "in a desktop environment, and to provide basic access to the\n"    \
                         "scheduler interface through an icon in the tray notification\n"    \
                         "area and its associated menu.\n\n"                                 \
                         "(running: %s)\n"
-#define APP_VERSION "0.1.5"
-#define APP_COPYRIGHT "(c) 2023"
+#define APP_VERSION "0.1.6"
+#define APP_COPYRIGHT "(c) 2023-2024"
 #define APP_AUTHOR "Francesco Garosi"
 #define APP_WEBSITE "https://github.com/almostearthling/"
 
@@ -138,8 +146,11 @@ bool WTApp::OnInit() {
         return false;
     }
 
+    // set the app name in order to use it in determinination of app directory
+    this->SetAppName(APP_NAME);
+
     // create the main window
-    hidden_frame = new WTHiddenFrame(APP_NAME);
+    hidden_frame = new WTHiddenFrame(APP_DISPLAY_NAME);
     hidden_frame->Show(DEBUG_SHOW_FRAME);
 
     return true;

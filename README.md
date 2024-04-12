@@ -17,7 +17,7 @@
 <!-- /code_chunk_output -->
 
 
-**whenever_tray** aims at being the most essential, lightweight, and cross-platform wrapper for the [**whenever**](https://github.com/almostearthling/whenever) utility. Its purpose is to launch **whenever** and control it through its I/O based interface, so that
+**whenever_tray** aims at being the most essential, lightweight, and cross-platform wrapper for the [**whenever**](https://github.com/almostearthling/whenever) automation tool. Its purpose is to launch **whenever** and control it through its I/O based interface, so that
 
 * the scheduler is started when **whenever_tray** runs
 * it stops when the **whenever_tray** exits
@@ -65,11 +65,11 @@ logview_command = 'gnome-text-editor'
 
 and should be found in the so-called _application data directory_. The position of this directory varies on different operating systems:
 
-* `%AppData%\whenever_tray\` on Windows
-* `~/.whenever_tray/` on UNIX/Linux
-* `~/Library/Application Support/.whenever_tray/` on Mac
+* `%AppData%\Whenever\` on Windows
+* `~/.whenever/` on UNIX/Linux
+* `~/Library/Application Support/.Whenever/` on Mac
 
-and the directory, as well as a well-formed configuration file, have to be present before **whenever_tray** is launched -- otherwise the application will complain that the configuration file cannot be read, before running using the default values. All entries are optional, but an empty file should at least contain an empty `[whenever_tray]` section for the application not to show an error pop-up at startup. A sample _whenever_tray.toml_ with the sample contents is provided in the repository. In the `whenever_command` and `logview_command` entries, the full path to the executable can be omitted if the executable itself is in a location within the search _PATH_.
+and the directory, as well as a well-formed configuration file, have to be present before **whenever_tray** is launched -- otherwise the application will complain that the configuration file cannot be read, before running using the default values. All entries are optional, but an empty file should at least contain an empty `[whenever_tray]` section for the application not to show an error pop-up at startup. A sample _whenever_tray.toml_ with the sample contents is provided in the repository. In the `whenever_command` and `logview_command` entries, the full path to the executable can be omitted if the executable itself is in a location within the search _PATH_. Note that the name of the application directory has been chosen to specify the close link to the **whenever** utility, thus removing the _tray_ suffix that remains in the name of the executable, as this wrapper should be considered a part of the **whenever** project.
 
 At the moment **whenever_tray** does not perform any substitution in the paths provided in the configuration file: a `~` is thus not expanded to the user home directory, and environment variable mentions are not replaced by their values. Since all paths will be relative to the path from which the application is launched, it is recommended to explicitly specify full paths for both `whenever_logfile` and `whenever_config`.
 
